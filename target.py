@@ -416,7 +416,7 @@ def main(project_path, reference, ref_start, ref_end, min_len, max_len, min_dept
                         f"\n------->Running artic pipeline for {sample_no} st/nd sample {sample_name} in new window\n\n")
 
                 # start artic pipeline in new window
-                artic_cmd = f"artic minion --medaka --normalise 50 --threads {artic_threads} --scheme-directory ~/artic-ncov2019/primer_schemes " \
+                artic_cmd = f"artic minion --medaka --normalise 500 --threads {artic_threads} --scheme-directory ~/artic-ncov2019/primer_schemes " \
                             f"--read-file {sample_fastq} --fast5-directory {fast5_dir} " \
                             f"--sequencing-summary {seq_summary_file} {scheme_name} {sample_name} " \
                             f"2>&1 | tee -a {log_file_art_sample}"

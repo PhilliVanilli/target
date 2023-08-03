@@ -61,7 +61,7 @@ def main(infile, plot_folder, log_file, use_bwa, chosen_ref_scheme, chosen_ref_s
     if not use_bwa:
         # run read mapping using minimap
         print(f"\nrunning: minimap2 read mapping\n")
-        minimap2_cmd = f"minimap2 -a -Y -t 8 -x ava-ont {chosen_ref_scheme} {sample_fastq} -o {sam_name} " \
+        minimap2_cmd = f"minimap2 --secondary=no -a -Y -t {threads} -x map-ont {chosen_ref_scheme} {sample_fastq} -o {sam_name} " \
                        f"2>&1 | tee -a {log_file}"
         print("\n", minimap2_cmd, "\n")
         with open(log_file, "a") as handle:
