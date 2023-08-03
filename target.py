@@ -592,7 +592,7 @@ if __name__ == "__main__":
                         help="Generate consensus from MSA", required=False)
     parser.add_argument("-a", "--art", default=False, action="store_true",
                         help="Generate consensus with Artic pipeline", required=False)
-    parser.add_argument("-c", "--cpu_threads", type=int, default=16, choices=range(0, 16),
+    parser.add_argument("-c", "--cpu_threads", type=int, default=14, choices=range(0, 16),
                         help="The number of cpu threads to use for bwa, nanopolish etc...", required=False)
     parser.add_argument("-g", "--gpu_threads", type=int, default=8,
                         help="The number of gpu threads to use ...", required=False)
