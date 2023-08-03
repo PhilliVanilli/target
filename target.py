@@ -29,10 +29,10 @@ def main(project_path, reference, ref_start, ref_end, min_len, max_len, min_dept
          rerun_step_only, basecall_mode, msa_cons, artic, cpu_threads, gpu_threads, gpu_buffers, use_gaps, use_bwa,
          guppy_path, real_time):
 
-    # set the primer_scheme directory
+    # set the primer_scheme directory and medaka model
     script_folder = pathlib.Path(__file__).absolute().parent
     primer_scheme_dir = pathlib.Path(script_folder, "primer-schemes")
-
+    medaka_model=['r1041_e82_400bps_hac_g615','r941_min_hac_g507']
     # get folder paths
     project_path = pathlib.Path(project_path).absolute()
     plot_folder = pathlib.Path(project_path, "seq_depth_plots")
@@ -416,7 +416,7 @@ def main(project_path, reference, ref_start, ref_end, min_len, max_len, min_dept
                         f"\n------->Running artic pipeline for {sample_no} st/nd sample {sample_name} in new window\n\n")
 
                 # start artic pipeline in new window
-                artic_cmd = f"artic minion --medaka --normalise 500 --threads {artic_threads} --scheme-directory ~/artic-ncov2019/primer_schemes " \
+                artic_cmd = f"artic minion --medaka --medaka-model {medaka_model[basecall_mode]} --normalise 500 --threads {artic_threads} --scheme-directory ~/artic-ncov2019/primer_schemes " \
                             f"--read-file {sample_fastq} --fast5-directory {fast5_dir} " \
                             f"--sequencing-summary {seq_summary_file} {scheme_name} {sample_name} " \
                             f"2>&1 | tee -a {log_file_art_sample}"
