@@ -1,6 +1,7 @@
 import os, time
 import sys
 import argparse
+import subprocess
 import re
 import pathlib
 import datetime
@@ -377,12 +378,19 @@ def main(project_path, reference, ref_start, ref_end, min_len, max_len, min_dept
             all_art_sample_files = pathlib.Path(sample_folder).glob("*/art/*.fastq")
             sample_no = 0
             for sample_fastq in all_art_sample_files:
+
                 sample_no += 1
                 # get fastq path and name
                 sample_path = pathlib.Path(sample_fastq).parent
                 sample_name = pathlib.Path(sample_fastq).stem
                 log_file_art_sample = pathlib.Path(project_path, f"{time_stamp}_{sample_name}_log_file_art_sample.txt")
                 os.chdir(sample_path)
+
+                # do Nanoplot
+                nanoplotoutputdir= pathlib.Path(project_path, f"nanoplot/{sample_name}")
+                nanoplotcmd = f"NanoPlot --fastq {sample_fastq} -o {nanoplotoutputdir}"
+                print(nanoplotcmd)
+                subprocess.call(nanoplotcmd, shell=True)
 
                 # check free threads
                 finished_threads = msa_threads*len(list(pathlib.Path(sample_folder).glob("*/msa/finished.txt")))+ artic_threads*len(list(pathlib.Path(sample_folder).glob("*/art/finished.txt")))
@@ -408,7 +416,7 @@ def main(project_path, reference, ref_start, ref_end, min_len, max_len, min_dept
                         f"\n------->Running artic pipeline for {sample_no} st/nd sample {sample_name} in new window\n\n")
 
                 # start artic pipeline in new window
-                artic_cmd = f"artic minion --normalise 500 --threads {artic_threads} --scheme-directory ~/artic-ncov2019/primer_schemes " \
+                artic_cmd = f"artic minion --medaka --normalise 50 --threads {artic_threads} --scheme-directory ~/artic-ncov2019/primer_schemes " \
                             f"--read-file {sample_fastq} --fast5-directory {fast5_dir} " \
                             f"--sequencing-summary {seq_summary_file} {scheme_name} {sample_name} " \
                             f"2>&1 | tee -a {log_file_art_sample}"
@@ -513,10 +521,14 @@ def main(project_path, reference, ref_start, ref_end, min_len, max_len, min_dept
                 percent_coverage = round((seq_coverage / ref_length) * 100, 2)
                 fh.write(f"{v_name},{percent_coverage},{mean_depth}\n")
 
-    # run nanoplot
-    os.chdir(sample_folder)
-    nanoplotcmd= "for file in ./*/art/*.fastq;do folder=${file/.fastq/_nanoplot};nfolder=${folder/\/*\///}; NanoPlot --fastq $file -o ../nanoplot/$nfolder --tsv_stats;done"
-    try_except_exit_on_fail(nanoplotcmd)
+    # if run_step == 5:
+    #     # run nanoplot
+    #     os.chdir(sample_folder)
+    #     print(os.getcwd())
+    #     nanoplotcmd= "for file in ./*/art/*.fastq;do folder=${file/.fastq/_nanoplot};nfolder=${folder/\/*\///}; NanoPlot --fastq $file -o ../nanoplot/$nfolder;done"
+    #     # nanoplotcmd = "for file in ./*/art/*.fastq;do echo kak;done"
+    #     print(nanoplotcmd)
+    #     subprocess.call(nanoplotcmd, shell=True, executable ='/bin/bash')
 
     # print end time
     now = datetime.datetime.now()
