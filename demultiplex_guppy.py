@@ -10,7 +10,7 @@ class Formatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpForm
     pass
 
 
-def main(inpath, guppy_path, outpath, threads, gpu_buffers, use_gpu):
+def main(inpath, guppy_path, outpath, threads, bc_threads, use_gpu):
     # force absolute file paths
     inpath = pathlib.Path(inpath).absolute()
     outpath = pathlib.Path(outpath).absolute()
@@ -22,7 +22,7 @@ def main(inpath, guppy_path, outpath, threads, gpu_buffers, use_gpu):
         gpu_settings = f"-x 'auto'"
 
     guppy_demux_cmd = f"{str(guppy_demultiplexer)} -i {inpath} -s {outpath} -t {threads} " \
-                      f"--require_barcodes_both_ends --enable_trim_barcodes --num_barcoding_buffers {gpu_buffers} " \
+                      f"--require_barcodes_both_ends --enable_trim_barcodes --num_barcoding_threads {bc_threads} " \
                       f"--records_per_fastq 0 {gpu_settings}"
 
     run = try_except_continue_on_fail(guppy_demux_cmd)
@@ -47,17 +47,17 @@ if __name__ == "__main__":
                         help='The path for the outfile')
     parser.add_argument("-t", "--threads", type=int, default=4,
                         help="The number of threads to use for demultiplexing", required=False)
-    parser.add_argument("-b", "--gpu_buffers", type=int, default=16,
-                        help="The number of gpu buffers to use for demultiplexing", required=False)
+    parser.add_argument("-bc", "--bc_threads", type=int, default=16,
+                        help="The number of barcoding threads to use for demultiplexing", required=False)
     parser.add_argument("-g", "--use_gpu", action='store_flase', default=True,
-                        help="The use this flaf to turn off gpu usage", required=False)
+                        help="Use this flag to turn off gpu usage", required=False)
 
     args = parser.parse_args()
     inpath = args.inpath
     guppy_path = args.guppy_path
     outpath = args.outpath
     threads = args.threads
-    gpu_buffers = args.gpu_buffers
+    bc_threads = args.bc_threads
     use_gpu = args.use_gpu
 
     main(inpath, guppy_path, outpath, threads, gpu_buffers, use_gpu)

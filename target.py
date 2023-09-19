@@ -102,7 +102,7 @@ def main(project_path, reference, ref_start, ref_end, min_len, max_len, min_dept
         handle.write(f"\nReference is {chosen_ref_scheme}\nPrimer bed file is {chosen_ref_scheme_bed_file}\n")
 
     if run_step == 0:
-        run = gupppy_basecall(fast5_dir, guppy_path, fastq_dir, gpu_threads, basecall_mode, real_time, reference, script_folder)
+        run = gupppy_basecall(fast5_dir, guppy_path, fastq_dir, bc_threads, basecall_mode, real_time, reference, script_folder)
         faildir = pathlib.Path(fastq_dir, "fail")
         shutil.rmtree(faildir)
         if run and not rerun_step_only:
@@ -122,7 +122,7 @@ def main(project_path, reference, ref_start, ref_end, min_len, max_len, min_dept
             if not list(fastq_dir.glob("*.fastq*")):
                 print(f"No fastq files found in {str(fastq_dir)} or {str(fastq_dir.parent)}")
                 sys.exit("fastq files not found")
-        run = guppy_demultiplex(fastq_dir, guppy_path, demultiplexed_folder, cpu_threads, gpu_buffers, gpu_threads)
+        run = guppy_demultiplex(fastq_dir, guppy_path, demultiplexed_folder, dm_threads, 16, dm_threads)
         if run and not rerun_step_only:
             run_step = 2
         elif run and rerun_step_only:
@@ -594,10 +594,10 @@ if __name__ == "__main__":
                         help="Generate consensus with Artic pipeline", required=False)
     parser.add_argument("-c", "--cpu_threads", type=int, default=14, choices=range(0, 16),
                         help="The number of cpu threads to use for bwa, nanopolish etc...", required=False)
-    parser.add_argument("-g", "--gpu_threads", type=int, default=8,
-                        help="The number of gpu threads to use ...", required=False)
-    parser.add_argument("-gb", "--gpu_buffers", type=int, default=15,
-                        help="The number of gpu buffers to use for demultiplexing", required=False)
+    parser.add_argument("-bc", "--bc_threads", type=int, default=12,
+                        help="The number of threads to use for gpu basecalling", required=False)
+    parser.add_argument("-dm", "--dm_threads", type=int, default=24,
+                        help="The number of threads to use for demultiplexing", required=False)
     parser.add_argument("--use_gaps", default='', action="store_const", const='-ug',
                         help="use gap characters when making the consensus sequences", required=False)
     parser.add_argument("--use_bwa", default='', action="store_const", const='-bwa',
@@ -622,13 +622,13 @@ if __name__ == "__main__":
     msa_cons = args.msa
     artic = args.art
     cpu_threads = args.cpu_threads
-    gpu_threads = args.gpu_threads
-    gpu_buffers = args.gpu_buffers
+    bc_threads = args.bc_threads
+    dm_threads = args.dm_threads
     use_gaps = args.use_gaps
     use_bwa = args.use_bwa
     guppy_path = args.guppy_path
     real_time = args.real_time
 
     main(project_path, reference, reference_start, reference_end, min_len, max_len, min_depth, run_step,
-         run_step_only, basecall_mode, msa_cons, artic, cpu_threads, gpu_threads, gpu_buffers, use_gaps, use_bwa,
+         run_step_only, basecall_mode, msa_cons, artic, cpu_threads, bc_threads, dm_threads, use_gaps, use_bwa,
          guppy_path, real_time)

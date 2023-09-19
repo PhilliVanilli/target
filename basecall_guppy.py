@@ -67,7 +67,7 @@ def main(inpath, guppy_path, outpath, gpu_threads, bascall_mode, real_time, refe
                     shutil.move(file, basecalling_folder)
 
             guppy_basecall_cmd = f"{str(guppy_basecaller)} -i {basecalling_folder} -r -s {outpath} -c {config} " \
-                                 f"--records_per_fastq 4000 --min_qscore 7 {resume}" \
+                                 f"--records_per_fastq 4000 --min_qscore 9 {resume}" \
                                  f"{gpu_settings}"
 
             run = try_except_continue_on_fail(guppy_basecall_cmd)
@@ -89,7 +89,7 @@ def main(inpath, guppy_path, outpath, gpu_threads, bascall_mode, real_time, refe
 
     else:
         guppy_basecall_cmd = f"{str(guppy_basecaller)} -i {inpath} -r -s {outpath} -c {config} " \
-                             f"--compress_fastq --records_per_fastq 4000 --min_qscore 7 " \
+                             f"--compress_fastq --records_per_fastq 4000 --min_qscore 9 " \
                              f"{gpu_settings}"
 
         run = try_except_continue_on_fail(guppy_basecall_cmd)
@@ -113,7 +113,7 @@ if __name__ == "__main__":
                         help='The path to script_folder')
     parser.add_argument('-o', '--outpath', type=str, default=None, required=True,
                         help='The path for the outfile')
-    parser.add_argument("-g", "--gpu_threads", type=int, default=4,
+    parser.add_argument("-g", "--gpu_threads", type=int, default=6,
                         help="The number of gpu threads to use, use '0' if no gpu available", required=False)
     parser.add_argument('-b', '--bascall_mode', type=int, choices=[0, 1], default=0, required=False,
                         help='0 = Fast mode\n'
